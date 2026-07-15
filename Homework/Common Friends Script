@@ -1,0 +1,11 @@
+SELECT u.user_id, u.user_name
+FROM users u
+JOIN friends f
+ON u.user_id = f.friend_id
+WHERE f.user_id IN (
+    SELECT user_id
+    FROM users
+    WHERE user_name IN ('Karl', 'Hans')
+)
+GROUP BY u.user_id, u.user_name
+HAVING COUNT(*) = 2;
