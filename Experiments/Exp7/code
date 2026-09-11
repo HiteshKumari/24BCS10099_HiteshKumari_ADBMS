@@ -1,0 +1,59 @@
+CREATE TABLE employees (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(100) NOT NULL,
+    emp_salary DECIMAL(10, 2) NOT NULL,
+      emp_city VARCHAR(100) NOT NULL
+);
+
+INSERT INTO employees (emp_id, emp_name, emp_salary, emp_city) VALUES
+(101, 'Amit Sharma', 85000.00, 'Mumbai'),
+(102, 'Priya Patel', 95000.00, 'Mumbai'),
+(103, 'Rahul Verma', 60000.00, 'Delhi'),
+(104, 'Ananya Iyer', 110000.00, 'Bangalore'),
+(105, 'Vikram Singh', 55000.00, 'Delhi'),
+(106, 'Sneha Reddy', 105000.00, 'Bangalore'),
+(107, 'Rohan Das', 72000.00, 'Kolkata')
+
+BEGIN
+    UPDATE employees
+    SET emp_salary = emp_salary * 1.1
+    WHERE emp_id = 101;
+
+    IF SQL%ROWCOUNT > 0 THEN
+        DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' rows updated');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('No rows updated');
+    END IF;
+END;
+/
+
+
+
+
+DECLARE 
+CURSOR emp_cursor IS SELECT emp_id, emp_salary FROM employees;
+V_emp_id employees.emp_id%TYPE;
+V_emp_salary employees.emp_salary%TYPE;
+SALARY_ZERO EXCEPTION;
+BEGIN
+    OPEN emp_cursor;
+    FETCH emp_cursor INTO V_emp_id, V_emp_salary;
+    WHILE emp_cursor%FOUND
+
+    LOOP
+        IF V_emp_salary=0 THEN
+        RAISE SALARY_ZERO;
+        END IF;
+
+        UPDATE employees
+        SET emp_salary = V_emp_salary*1.10
+        WHERE emp_id = V_emp_id;
+
+        FETCH emp_cursor INTO V_emp_id,V_emp_salary;
+        END LOOP;
+
+        CLOSE emp_cursor;
+        EXCEPTION
+        WHEN SALARY_ZERO THEN
+             DBMS_OUTPUT.PUT_LINE('Salary is zero. Increment not possible');
+        END;
